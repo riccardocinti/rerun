@@ -1,7 +1,6 @@
 use std::{fmt, net::SocketAddr, thread::JoinHandle};
 
 use crossbeam::channel::{select, Receiver, Sender};
-
 use re_log_types::LogMsg;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -77,15 +76,14 @@ impl Client {
             .name("msg_encoder".into())
             .spawn(move || {
                 msg_encode(encoding_options, &msg_rx, &encode_quit_rx, &packet_tx);
-            })
-            .expect("Failed to spawn thread");
+            }).unwrap_or_else(|e| panic!("Failed to spawn thread: {e}"));
 
         let send_join = std::thread::Builder::new()
             .name("tcp_sender".into())
             .spawn(move || {
                 tcp_sender(addr, flush_timeout, &packet_rx, &send_quit_rx, &flushed_tx);
             })
-            .expect("Failed to spawn thread");
+            .unwrap_or_else(|e| panic!("Failed to spawn thread: {e}"));
 
         Self {
             msg_tx,
@@ -238,8 +236,10 @@ fn tcp_sender(
                         PacketMsg::Flush => {
                             tcp_client.flush();
                             flushed_tx
-                                .send(FlushedMsg)
-                                .expect("Main thread should still be alive");
+                            .send(FlushedMsg)
+                            .unwrap_or_else(|_| {
+                                re_log::error!("Main thread should still be alive.");
+                            });
                         }
                     }
                 } else {

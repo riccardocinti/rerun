@@ -10,9 +10,7 @@
 #![doc = document_features::document_features!()]
 //!
 
-// TODO(#6330): remove unwrap()
-#![allow(clippy::unwrap_used)]
-#![warn(missing_docs)] // Let's keep the this crate well-documented!
+#![warn(missing_docs)] // Let's keep this crate well-documented!
 
 // ----------------
 // Private modules:

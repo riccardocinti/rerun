@@ -819,6 +819,7 @@ impl RecordingStream {
     ///
     /// See also: [`RecordingStreamBuilder`].
     #[must_use = "Recording will get closed automatically once all instances of this object have been dropped"]
+    #[allow(clippy::unwrap_used)]
     pub fn new(
         info: StoreInfo,
         batcher_config: ChunkBatcherConfig,
@@ -2173,6 +2174,7 @@ impl RecordingStream {
 // ---
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use re_chunk::TransportChunk;
 

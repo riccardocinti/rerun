@@ -73,12 +73,20 @@ impl Default for SpawnOptions {
 impl SpawnOptions {
     /// Resolves the final connect address value.
     pub fn connect_addr(&self) -> std::net::SocketAddr {
-        std::net::SocketAddr::new("127.0.0.1".parse().unwrap(), self.port)
+        let ip = "127.0.0.1".parse().unwrap_or_else(|_| {
+            eprintln!("Failed to parse the connection address. Falling back to default.");
+            std::net::IpAddr::V4([127, 0, 0, 1].into())
+        });
+        std::net::SocketAddr::new(ip, self.port)
     }
 
     /// Resolves the final listen address value.
     pub fn listen_addr(&self) -> std::net::SocketAddr {
-        std::net::SocketAddr::new("0.0.0.0".parse().unwrap(), self.port)
+        let ip = "0.0.0.0".parse().unwrap_or_else(|_| {
+            eprintln!("Failed to parse the listen address. Falling back to default.");
+            std::net::IpAddr::V4([0, 0, 0, 0].into())
+        });
+        std::net::SocketAddr::new(ip, self.port)
     }
 
     /// Resolves the final executable path.

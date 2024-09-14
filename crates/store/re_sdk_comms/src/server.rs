@@ -331,12 +331,15 @@ impl CongestionManager {
                 // decision on a time we've previously seen,
                 // thus sending parts of a sequence-time instead of all-or-nothing.
                 while timeline_history.send_time.len() > 1024 {
-                    let oldest_time = *timeline_history
+                    if let Some(&oldest_time) = timeline_history
                         .send_time
                         .keys()
-                        .next()
-                        .expect("safe because checked above");
-                    timeline_history.send_time.remove(&oldest_time);
+                        .next() {
+                        timeline_history.send_time.remove(&oldest_time);
+                    } else {
+                        // It should not happen because checked above.
+                        break;
+                    }
                 }
 
                 re_log::trace!("Send {timeline} {time}: {send_it}");
